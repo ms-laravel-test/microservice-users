@@ -9,7 +9,7 @@ services:
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
-            - '${APP_PORT:-80}:80'
+            - '${APP_PORT:-80}:${APP_PORT:-80}'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         command: php artisan serve --host=0.0.0.0 --port=${APP_PORT:-80}
         environment:
