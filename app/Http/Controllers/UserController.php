@@ -14,9 +14,17 @@ class UserController extends Controller
     public function index(): \Illuminate\Http\JsonResponse
     {
         $users = User::all();
-        foreach ($users as $user){
-            $user->note = Http::get("http://microservice-note:8003/api/user/{$user->id}/notes")->json();
-        }
+
+        $responses = Http::pool(
+            fn($pool) =>
+                $users->map(fn($user) => $pool->get("http://laravel.test:8003/api/user/{$user->id}/notes"))
+        );
+
+        $users = $users->map(function ($user, $index) use ($responses) {
+            $user->note = $responses[$index]->successful() ? $responses[$index]->json() : [];
+            return $user;
+        });
+
         return response()->json($users);
     }
 
