@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'database'),
+    'default' => env('QUEUE_CONNECTION', 'rabbitmq'),
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +73,6 @@ return [
         ],
 
         'rabbitmq' => [
-
             'driver' => 'rabbitmq',
             'hosts' => [
                 [
@@ -81,13 +80,17 @@ return [
                     'port' => env('RABBITMQ_PORT', 5672),
                     'user' => env('RABBITMQ_USER', 'guest'),
                     'password' => env('RABBITMQ_PASSWORD', 'guest'),
-                    'vhost' => env('RABBITMQ_VHOST', '/'),
                 ],
-                // ...
             ],
-
-            // ...
+            'queue' => env('RABBITMQ_QUEUE', 'default'),
+            'options' => [
+                'exchange' => [
+                    'name' => env('RABBITMQ_EXCHANGE_NAME', 'default_exchange'),
+                    'type' => env('RABBITMQ_EXCHANGE_TYPE', 'direct'),
+                ],
+            ],
         ],
+
 
     ],
 

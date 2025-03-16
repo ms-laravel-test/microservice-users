@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "83ebb0057c1a478562804a05decc84b6",
+    "content-hash": "c1cb1799291543dfd0388fdc7672404f",
     "packages": [
         {
             "name": "brick/math",
@@ -2069,6 +2069,58 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
+        },
+        {
+            "name": "miladshm/controller-helpers",
+            "version": "v0.8.42",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/miladshm/controller-helpers.git",
+                "reference": "0f606b7f1516a7a4c0a4ba1447146fff38f712f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/miladshm/controller-helpers/zipball/0f606b7f1516a7a4c0a4ba1447146fff38f712f6",
+                "reference": "0f606b7f1516a7a4c0a4ba1447146fff38f712f6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": ">=9.0",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.5",
+                "phpunit/phpunit": ">=9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Miladshm\\ControllerHelpers\\Providers\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Miladshm\\ControllerHelpers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "milad",
+                    "email": "mldsh6@gmail.com"
+                }
+            ],
+            "description": "Resource controller methods in traits",
+            "support": {
+                "issues": "https://github.com/miladshm/controller-helpers/issues",
+                "source": "https://github.com/miladshm/controller-helpers/tree/v0.8.42"
+            },
+            "time": "2025-02-04T08:15:47+00:00"
         },
         {
             "name": "monolog/monolog",

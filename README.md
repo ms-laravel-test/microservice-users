@@ -25,7 +25,10 @@ this is testing microservice with laravel
     docker exec -it $(docker ps --filter "name=container-namelaravel.test" -q) bash
 ```
 ``` 
-    php artisan serve
+    php artisan migrate
+```
+``` 
+    docker network connect laravel_network rabbitmq
 ```
 
 ---
