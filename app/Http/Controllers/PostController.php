@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Facade\RabbitMq;
+use App\Services\Global\RMConnection;
+use Exception;
 use Illuminate\Http\JsonResponse;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -13,41 +15,14 @@ class PostController extends Controller
      */
     public function show($userId): JsonResponse
     {
-        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
-        $channel = $connection->channel();
+        try {
+            $rmConnection = new RMConnection();
+            $response = $rmConnection->sendRequest('get_user_posts', ['user_id' => $userId]);
 
-        list($callbackQueue, ,) = $channel->queue_declare("", false, false, true, false);
-
-        $data = json_encode(['user_id' => $userId]);
-        $correlationId = uniqid();
-
-        $msg = new AMQPMessage(
-            $data,
-            [
-                'correlation_id' => $correlationId,
-                'reply_to' => $callbackQueue
-            ]
-        );
-
-        $channel->basic_publish($msg, '', 'get_user_posts');
-
-        $response = null;
-
-        $callback = function ($msg) use (&$response, $correlationId) {
-            if ($msg->get('correlation_id') == $correlationId) {
-                $response = json_decode($msg->body, true);
-            }
-        };
-
-        $channel->basic_consume($callbackQueue, '', false, true, false, false, $callback);
-
-        while (!$response) {
-            $channel->wait();
+            return response()->json($response);
+        } catch (Exception $e) {
+            Log::error('Error in RMConnection', ['message' => $e->getMessage()]);
+            return response()->json(['error' => 'Could not get user posts'], 500);
         }
-
-        $channel->close();
-        $connection->close();
-
-        return response()->json($response);
     }
 }
