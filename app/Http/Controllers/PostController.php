@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facade\RabbitMq;
-use App\Services\Global\RMConnection;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -16,8 +15,7 @@ class PostController extends Controller
     public function show($userId): JsonResponse
     {
         try {
-            $rmConnection = new RMConnection();
-            $response = $rmConnection->sendRequest('get_user_posts', ['user_id' => $userId]);
+            $response = RabbitMq::sendRequest('get_user_posts', ['user_id' => $userId]);
 
             return response()->json($response);
         } catch (Exception $e) {
