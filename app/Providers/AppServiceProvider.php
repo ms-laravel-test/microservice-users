@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\Global\RMConnection;
+use App\Helpers\RMConnection;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

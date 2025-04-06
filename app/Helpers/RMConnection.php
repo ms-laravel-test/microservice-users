@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Global;
+namespace App\Helpers;
 
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +61,49 @@ class RMConnection
         $this->channel->basic_publish($msg, '', $queue);
 
         return $this->waitForResponse($callbackQueue, $correlationId);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listen(string $queueName, callable $handler): void
+    {
+        $this->channel->queue_declare($queueName, false, true, false, false);
+
+        Log::info("Listening on RabbitMQ queue: {$queueName}");
+
+        $callback = function (AMQPMessage $msg) use ($handler) {
+            $requestData = json_decode($msg->body, true);
+
+            $replyTo = $msg->get('reply_to');
+            $correlationId = $msg->get('correlation_id');
+
+            if (!$replyTo || !$correlationId) {
+                Log::warning('Invalid message received: Missing reply_to or correlation_id');
+                return;
+            }
+
+            try {
+                $responseData = call_user_func($handler, $requestData);
+                $responseBody = json_encode($responseData);
+
+                $responseMsg = new AMQPMessage($responseBody, [
+                    'correlation_id' => $correlationId,
+                ]);
+
+                $this->channel->basic_publish($responseMsg, '', $replyTo);
+            } catch (Exception $e) {
+                Log::error("Error handling message: " . $e->getMessage());
+            }
+        };
+
+        $this->channel->basic_consume($queueName, '', false, true, false, false, $callback);
+
+        while ($this->channel->is_consuming()) {
+            $this->channel->wait();
+        }
+
+        $this->closeConnection();
     }
 
     /**
