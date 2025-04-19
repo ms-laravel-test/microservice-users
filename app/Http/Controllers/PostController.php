@@ -2,25 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Facade\RabbitMq;
-use Exception;
+use App\Services\Post\PostService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
+    //Todo: add listener for create,delete,update post and update redis
     /**
      * @throws \Exception
      */
     public function show($userId): JsonResponse
     {
-        try {
-            $response = RabbitMq::sendRequest('get_user_posts', ['user_id' => $userId]);
-
-            return response()->json($response);
-        } catch (Exception $e) {
-            Log::error('Error in RMConnection', ['message' => $e->getMessage()]);
-            return response()->json(['error' => 'Could not get user posts'], 500);
-        }
+        return resolve(PostService::class)->show($userId);
     }
 }
