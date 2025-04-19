@@ -3,6 +3,7 @@
 namespace App\Services\Post;
 
 use App\Facade\RabbitMq;
+use App\Helpers\ResponseBuilder;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -24,21 +25,21 @@ class PostService
 
         } catch (Exception $e) {
             Log::error('Error in RMConnection', ['message' => $e->getMessage()]);
-            return response()->json(['error' => 'Could not get user posts'], 500);
+            return ResponseBuilder::error('Could not get user posts');
         }
     }
 
     protected function respondWithCache(string $key): JsonResponse
     {
         $cached = Redis::get($key);
-        return response()->json(json_decode($cached));
+        return ResponseBuilder::success(json_decode($cached));
     }
 
     protected function fetchAndCachePosts(int $userId, string $key): JsonResponse
     {
         $response = RabbitMq::sendRequest('get_user_posts', ['user_id' => $userId]);
         Redis::set($key, json_encode($response));
-        return response()->json($response);
+        return ResponseBuilder::success($response);
     }
 
 }
